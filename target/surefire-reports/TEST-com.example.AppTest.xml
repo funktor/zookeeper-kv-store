@@ -14,7 +14,7 @@
     <property name="os.name" value="Linux"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-11-openjdk-amd64/lib"/>
-    <property name="sun.java.command" value="/home/amondal/zookeeper-kv-store/target/surefire/surefirebooter12456180754548299821.jar /home/amondal/zookeeper-kv-store/target/surefire 2023-08-07T17-00-17_395-jvmRun1 surefire16380178202397971551tmp surefire_03142789960160855946tmp"/>
+    <property name="sun.java.command" value="/home/amondal/zookeeper-kv-store/target/surefire/surefirebooter3239268054523533061.jar /home/amondal/zookeeper-kv-store/target/surefire 2023-08-07T18-01-32_288-jvmRun1 surefire7665932273838395717tmp surefire_01797374011597087766tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/amondal/zookeeper-kv-store/target/test-classes:/home/amondal/zookeeper-kv-store/target/classes:/home/amondal/.m2/repository/org/slf4j/slf4j-api/2.0.0-alpha0/slf4j-api-2.0.0-alpha0.jar:/home/amondal/.m2/repository/junit/junit/4.11/junit-4.11.jar:/home/amondal/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/amondal/.m2/repository/org/apache/zookeeper/zookeeper/3.8.2/zookeeper-3.8.2.jar:/home/amondal/.m2/repository/org/apache/zookeeper/zookeeper-jute/3.8.2/zookeeper-jute-3.8.2.jar:/home/amondal/.m2/repository/org/apache/yetus/audience-annotations/0.12.0/audience-annotations-0.12.0.jar:/home/amondal/.m2/repository/io/netty/netty-handler/4.1.94.Final/netty-handler-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-common/4.1.94.Final/netty-common-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-resolver/4.1.94.Final/netty-resolver-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-buffer/4.1.94.Final/netty-buffer-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-transport/4.1.94.Final/netty-transport-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-transport-native-unix-common/4.1.94.Final/netty-transport-native-unix-common-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-codec/4.1.94.Final/netty-codec-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-transport-native-epoll/4.1.94.Final/netty-transport-native-epoll-4.1.94.Final.jar:/home/amondal/.m2/repository/io/netty/netty-transport-classes-epoll/4.1.94.Final/netty-transport-classes-epoll-4.1.94.Final.jar:/home/amondal/.m2/repository/ch/qos/logback/logback-core/1.2.10/logback-core-1.2.10.jar:/home/amondal/.m2/repository/ch/qos/logback/logback-classic/1.2.10/logback-classic-1.2.10.jar:/home/amondal/.m2/repository/commons-io/commons-io/2.11.0/commons-io-2.11.0.jar:/home/amondal/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/amondal/.m2/repository/org/json/json/20230618/json-20230618.jar:/home/amondal/.m2/repository/commons-codec/commons-codec/1.16.0/commons-codec-1.16.0.jar:/home/amondal/.m2/repository/org/apache/commons/commons-lang3/3.9/commons-lang3-3.9.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -30,7 +30,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
-    <property name="surefire.real.class.path" value="/home/amondal/zookeeper-kv-store/target/surefire/surefirebooter12456180754548299821.jar"/>
+    <property name="surefire.real.class.path" value="/home/amondal/zookeeper-kv-store/target/surefire/surefirebooter3239268054523533061.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="11.0.19+7-post-Ubuntu-0ubuntu122.04.1"/>
     <property name="user.name" value="amondal"/>
@@ -55,5 +55,5 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="55.0"/>
   </properties>
-  <testcase name="shouldAnswerWithTrue" classname="com.example.AppTest" time="0.001"/>
+  <testcase name="shouldAnswerWithTrue" classname="com.example.AppTest" time="0"/>
 </testsuite>
