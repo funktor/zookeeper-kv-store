@@ -2,8 +2,10 @@ package com.example;
 
 import java.nio.channels.SocketChannel;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
@@ -20,6 +22,7 @@ public class HandleRequest {
     private SocketChannel client;
     private Controller ctl;
     private MessageFormat msg; 
+    private int NUM_RETRIES=5;
 
     public HandleRequest(String request, SocketChannel client, Controller ctl) {
         this.request = request;
@@ -295,6 +298,39 @@ public class HandleRequest {
                 else if (msg.operator.equals("REPLICATE")) {
                     handleReplicateRequest();
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleGatewayRequest() {
+        System.out.println(request);
+
+        try {
+            if (msg.request_type == 1) {
+                if (ctl.getRequestMap().containsKey(msg.request_id)) {
+                    SocketChannel cl = ctl.getRequestMap().remove(msg.request_id);
+                    String clientMsg = request + "<EOM>";
+                    ctl.sendMessage(clientMsg, cl);
+                }
+            }
+            else {
+                int cnt = 0;
+                while (cnt < NUM_RETRIES) {
+                    Map<String, String> leaderNodes = ctl.getLeaders();
+                    String node = leaderNodes.entrySet().iterator().next().getValue();
+                    System.out.println(node);
+
+                    ctl.getRequestMap().put(msg.request_id, client);
+                    int resp = ctl.sendMessage(request + "<EOM>", node);
+                    if (resp > 0) {
+                        break;
+                    }
+                    cnt += 1;
+                    TimeUnit.MILLISECONDS.sleep(100);
+                }
+                
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -31,7 +31,7 @@ public class Client {
 
     private Client() {
         try {
-            socket = SocketChannel.open(new InetSocketAddress("localhost", 5001));
+            socket = SocketChannel.open(new InetSocketAddress("127.0.0.1", 5050));
         } catch (IOException e) {
             e.printStackTrace();
         }

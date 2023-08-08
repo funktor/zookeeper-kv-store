@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,8 @@ public class Controller {
     private Selector selector;
     private String DELIM = "<EOM>";
     private Map<String, SocketChannel> requestMap = new ConcurrentHashMap<String, SocketChannel>();
+    private Map<String, String> leaders = new ConcurrentHashMap<String, String>();
+    private Set<String> allPartitions = new HashSet<String>();
 
     public Controller(String hostPort, String partitionId, Selector selector) {
         this.hostPort = hostPort;
@@ -162,7 +165,20 @@ public class Controller {
         
     }
 
-    public void sendMessage(String request, String nodeHostPort) {
+    public int sendMessage(String request, SocketChannel socket) {
+        try {
+            ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
+            return socket.write(buffer);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+
+        return -1;
+    }
+
+
+    public int sendMessage(String request, String nodeHostPort) {
         try {
             SocketChannel socket;
 
@@ -178,43 +194,16 @@ public class Controller {
                 nodeMap.put(nodeHostPort, socket);
             }
 
-            ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
-            
-            while(true) {
-                int m = socket.write(buffer);
-
-                if (m == -1) {
-                    socket.close();
-
-                    TimeUnit.SECONDS.sleep(1);
-
-                    String[] ipPort = nodeHostPort.split(":");
-                    String ip = ipPort[0];
-                    int port = Integer.parseInt(ipPort[1]);
-                    socket = SocketChannel.open(new InetSocketAddress(ip, port));
-                    registerClientWithSelector(selector, socket);
-                    nodeMap.put(nodeHostPort, socket);
-                }
-                else {
-                    break;
-                }
-            }
+            return sendMessage(request, socket);
 
         } catch (Exception e) {
             e.printStackTrace();
         } 
+
+        return -1;
     }
 
-    public void sendMessage(String request, SocketChannel socket) {
-        try {
-            ByteBuffer buffer = ByteBuffer.wrap(request.getBytes());
-            socket.write(buffer);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-    }
-
+    
     public void updateSequence(int sequence) {
         try {
             zkmanager.updateAsync(
@@ -555,5 +544,102 @@ public class Controller {
 
     public Map<String, SocketChannel> getRequestMap() {
         return requestMap;
+    }
+
+    public void checkPartitionsAndAddLeaders() {
+        try {
+            zkmanager.getZNodeChildrenAsync(
+                "/partitions", 
+                new Watcher() {
+                    @Override
+                    public void process(WatchedEvent event) {
+                        if (event.getType() == EventType.NodeChildrenChanged) {
+                            checkPartitionsAndAddLeaders();
+                        }
+                    }
+                }, 
+                new ChildrenCallback() {
+                    @Override
+                    public void processResult(int rc, String path, Object ctx, List<String> children) {
+                        switch(Code.get(rc)) {
+                            case OK:
+                                for (String partition : children) {
+                                    if (!allPartitions.contains(partition)) {
+                                        allPartitions.add(partition);
+                                        new Thread(() -> checkLeadersAndAddLeaders(partition)).start();
+                                    }
+                                } 
+
+                                break;
+
+                            case CONNECTIONLOSS:
+                                checkPartitionsAndAddLeaders();
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void checkLeadersAndAddLeaders(String partition) {
+        try {
+            String path = "/partitions/" + partition + "/leader";
+
+            zkmanager.getZNodeDataAsync(
+                path, 
+                new Watcher() {
+                    @Override
+                    public void process(WatchedEvent event) {
+                        if (event.getType() == EventType.NodeDeleted 
+                                || event.getType() == EventType.NodeCreated
+                                || event.getType() == EventType.NodeDataChanged) {
+                            checkLeadersAndAddLeaders(partition);
+                        }            
+                    }
+                }, 
+                new DataCallback() {
+                    @Override
+                    public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
+                        switch(Code.get(rc)) {
+                            case OK:
+                                try {
+                                    String d = new String(data, "UTF-8");
+                                    leaders.put(partition, d);
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+
+                            case NONODE:
+                                if (leaders.containsKey(partition)) {
+                                    leaders.remove(partition);
+                                }
+                                checkLeadersAndAddLeaders(partition);
+                                break;
+
+                            case CONNECTIONLOSS:
+                                checkLeadersAndAddLeaders(partition);
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Map<String, String> getLeaders() {
+        return leaders;
     }
 }
